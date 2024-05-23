@@ -1,17 +1,36 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+export default function DogsList( { dogs, getDogs, setCurrentDog }) {
+  const navigate = useNavigate()
+  const editDog = id => {
+    setCurrentDog(id)
+    navigate('form')
+  }
 
-export default function DogsList() {
+  const deleteDog = id => {
+    fetch(`http://localhost:3003/api/dogs/${id}`, {
+    method: 'DELETE'
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Problem DELETing dogs')
+      getDogs()
+      setCurrentDog(null)
+    })
+
+  }
   return (
     <div>
       <h2>Dogs Shelter</h2>
       <ul>
-        <li>
-          Fido, Bulldog, NOT adopted
+        {dogs.map(dog => (
+          <li key={dog.id}>
+          {dog.name}, {dog.breed}, {dog.adopted ? '' : 'NOT'} adopted
           <div>
-            <button>Edit</button>
-            <button>Delete</button>
+            <button onClick={() => editDog(dog.id)}>Edit</button>
+            <button onClick={() => deleteDog(dog.id)}>Delete</button>
           </div>
         </li>
+        ))}
       </ul>
     </div>
   )
